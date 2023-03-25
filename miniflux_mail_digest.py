@@ -66,13 +66,8 @@ def fetch_entries(client: miniflux.Client, category_title: str) -> Iterable[dict
         print(f"Uhhh what happened to the {category_title} category?", file=sys.stderr)
         sys.exit(1)
 
-    # limit=999 because it seems like the category parameter doesn't actually work.
-    # the default limit is 100 and it's hijacked by entries from other categories
-    entries = client.get_entries(status="unread", category=category_id, limit=999)["entries"]
-    for entry in entries:
-        # idk why it leaks but it leaks haha
-        if entry["feed"]["category"]["id"] == category_id:
-            yield entry
+    entries = client.get_entries(category_id=category_id, status="unread")["entries"]
+    yield from entries
     client.mark_category_entries_as_read(category_id)
 
 
