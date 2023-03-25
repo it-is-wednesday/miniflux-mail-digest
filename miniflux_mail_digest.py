@@ -63,8 +63,8 @@ def fetch_entries(client: miniflux.Client, category_title: str) -> Iterable[dict
     try:
         category_id = next(c for c in client.get_categories() if c["title"] == category_title)["id"]
     except StopIteration:
-        print(f"Uhhh what happened to the {category_title} category?")
-        return
+        print(f"Uhhh what happened to the {category_title} category?", file=sys.stderr)
+        sys.exit(1)
 
     # limit=999 because it seems like the category parameter doesn't actually work.
     # the default limit is 100 and it's hijacked by entries from other categories
