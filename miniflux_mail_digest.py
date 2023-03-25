@@ -6,6 +6,7 @@ TODO:
 """
 import os
 import smtplib
+import sys
 from email.message import EmailMessage
 from string import Template
 from typing import Iterable, TypedDict
@@ -14,17 +15,26 @@ import miniflux  # type: ignore
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
+__version__ = "0.1"
+
 PEEK_CHARS_COUNT = 300
 
 
 def getenv(key: str) -> str:
     """Get env var or throw"""
+    key = "MINIFLUX_DIGEST_" + key
     if not (val := os.getenv(key)):
-        raise Exception(f"Kindly set {key}")
+        print(
+            f"You need to set environment variable {key}. You can dump it in .env",
+            file=sys.stderr,
+        )
+        sys.exit(1)
     return val
+
 
 class Entry(TypedDict):
     """An entry in the digest mail message"""
+
     title: str
     source_feed: str
     content_peek: str
@@ -93,9 +103,9 @@ def main():
     """Entry point"""
     load_dotenv()
 
-    miniflux_api_key = getenv("MINIFLUX_API_KEY")
-    miniflux_api_url = getenv("MINIFLUX_API_URL")
-    miniflux_category = getenv("MINIFLUX_CATEGORY")
+    miniflux_api_key = getenv("API_KEY")
+    miniflux_api_url = getenv("API_URL")
+    miniflux_category = getenv("CATEGORY_TITLE")
     smtp_password = getenv("SMTP_PASSWORD")
     smtp_server = getenv("SMTP_SERVER")
     smtp_user = getenv("SMTP_USER")
@@ -115,3 +125,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Local Variables:
+# pyvenv-activate: "~/.virtualenvs/miniflux-mail-digest"
+# End:

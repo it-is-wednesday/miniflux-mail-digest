@@ -1,3 +1,0 @@
-miniflux
-beautifulsoup4
-python-dotenv
