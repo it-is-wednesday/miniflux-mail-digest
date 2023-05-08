@@ -10,7 +10,7 @@ import sys
 from email.message import EmailMessage
 from string import Template
 from typing import Iterable, List
-from typing_extensions import TypedDict
+from dataclasses import dataclass, asdict
 
 import miniflux  # type: ignore
 from bs4 import BeautifulSoup
@@ -34,7 +34,8 @@ def getenv(key: str) -> str:
     return val
 
 
-class Entry(TypedDict):
+@dataclass
+class Entry:
     """An entry in the digest mail message"""
 
     title: str
@@ -51,7 +52,7 @@ def entry_essence(entry: dict) -> Entry:
     # some feeds serve HTML in the content field rather than plaintext. can you
     # believe it?
     content_text = BeautifulSoup(entry["content"], "html.parser").text.replace("\n", " ")
-    return dict(
+    return Entry(
         title=entry["title"],
         source_feed=entry["feed"]["title"],
         content_peek=f"{content_text[:PEEK_CHARS_COUNT]}…",
@@ -81,7 +82,7 @@ def make_html(entries: List[Entry]):
     with open("templates/entry.html", encoding="utf-8") as entryfile:
         template_entry = Template(entryfile.read())
 
-    entries_html = "".join(template_entry.substitute(**e) for e in entries)
+    entries_html = "".join(template_entry.substitute(**asdict(e)) for e in entries)
     return template_message.substitute(entries=entries_html)
 
 
