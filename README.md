@@ -19,13 +19,12 @@ MINIFLUX_DIGEST_MAIL_TITLE=
 
 ## Installation
 ``` shell
-python3 -m venv venv
-venv/bin/pip install .
+poetry install
 ```
 
 ## Usage
 ``` shell
-venv/bin/miniflux-mail-digest
+miniflux-mail-digest
 ```
 
 It'll work

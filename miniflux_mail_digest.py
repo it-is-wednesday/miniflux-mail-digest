@@ -120,7 +120,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Local Variables:
-# pyvenv-activate: "~/.virtualenvs/miniflux-mail-digest"
-# End:
