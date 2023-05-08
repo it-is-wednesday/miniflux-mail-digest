@@ -9,7 +9,8 @@ import smtplib
 import sys
 from email.message import EmailMessage
 from string import Template
-from typing import Iterable, TypedDict
+from typing import Iterable, List
+from typing_extensions import TypedDict
 
 import miniflux  # type: ignore
 from bs4 import BeautifulSoup
@@ -23,7 +24,8 @@ PEEK_CHARS_COUNT = 300
 def getenv(key: str) -> str:
     """Get env var or throw"""
     key = "MINIFLUX_DIGEST_" + key
-    if not (val := os.getenv(key)):
+    val = os.getenv(key)
+    if not val:
         print(
             f"You need to set environment variable {key}. You can dump it in .env",
             file=sys.stderr,
@@ -71,16 +73,16 @@ def fetch_entries(client: miniflux.Client, category_title: str) -> Iterable[dict
     client.mark_category_entries_as_read(category_id)
 
 
-def make_html(entries: list[Entry]):
+def make_html(entries: List[Entry]):
     """Bake a nice HTML-based E-mail featuring _entries_"""
-    with (
-        open("templates/message.html", encoding="utf-8") as messagefile,
-        open("templates/entry.html", encoding="utf-8") as entryfile,
-    ):
+    with open("templates/message.html", encoding="utf-8") as messagefile:
         template_message = Template(messagefile.read())
+
+    with open("templates/entry.html", encoding="utf-8") as entryfile:
         template_entry = Template(entryfile.read())
-        entries_html = "".join(template_entry.substitute(**e) for e in entries)
-        return template_message.substitute(entries=entries_html)
+
+    entries_html = "".join(template_entry.substitute(**e) for e in entries)
+    return template_message.substitute(entries=entries_html)
 
 
 def make_mail(title: str, content: str, from_addr: str, to_addr: str) -> EmailMessage:

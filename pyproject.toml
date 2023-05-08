@@ -6,10 +6,10 @@ authors = ["Maor Kadosh <git@avocadosh.xyz>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.7"
 miniflux = "^0.0.15"
 beautifulsoup4 = "^4.12.2"
-python-dotenv = "^1.0.0"
+python-dotenv = "^0.21.1" # because of the python version
 
 
 [tool.poetry.group.dev.dependencies]
