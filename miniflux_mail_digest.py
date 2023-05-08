@@ -9,7 +9,7 @@ import smtplib
 import sys
 from email.message import EmailMessage
 from string import Template
-from typing import Iterable, List
+from typing import Iterable
 from dataclasses import dataclass, asdict
 
 import miniflux  # type: ignore
@@ -74,7 +74,7 @@ def fetch_entries(client: miniflux.Client, category_title: str) -> Iterable[dict
     client.mark_category_entries_as_read(category_id)
 
 
-def make_html(entries: List[Entry]):
+def make_html(entries: Iterable[Entry]):
     """Bake a nice HTML-based E-mail featuring _entries_"""
     with open("templates/message.html", encoding="utf-8") as messagefile:
         template_message = Template(messagefile.read())
