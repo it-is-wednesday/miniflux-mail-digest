@@ -7,10 +7,11 @@ TODO:
 import os
 import smtplib
 import sys
+from dataclasses import asdict, dataclass
 from email.message import EmailMessage
+from importlib import resources
 from string import Template
 from typing import Iterable
-from dataclasses import dataclass, asdict
 
 import miniflux  # type: ignore
 from bs4 import BeautifulSoup
@@ -76,12 +77,8 @@ def fetch_entries(client: miniflux.Client, category_title: str) -> Iterable[dict
 
 def make_html(entries: Iterable[Entry]):
     """Bake a nice HTML-based E-mail featuring _entries_"""
-    with open("templates/message.html", encoding="utf-8") as messagefile:
-        template_message = Template(messagefile.read())
-
-    with open("templates/entry.html", encoding="utf-8") as entryfile:
-        template_entry = Template(entryfile.read())
-
+    template_message = Template(resources.open_text(__name__, "templates/message.html").read())
+    template_entry = Template(resources.open_text(__name__, "templates/entry.html").read())
     entries_html = "".join(template_entry.substitute(**asdict(e)) for e in entries)
     return template_message.substitute(entries=entries_html)
 
