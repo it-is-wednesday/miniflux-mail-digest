@@ -5,6 +5,7 @@ TODO:
 - Logging
 """
 import os
+import pkgutil
 import smtplib
 import sys
 from email.message import EmailMessage
@@ -76,11 +77,12 @@ def fetch_entries(client: miniflux.Client, category_title: str) -> Iterable[dict
 
 def make_html(entries: List[Entry]):
     """Bake a nice HTML-based E-mail featuring _entries_"""
-    with open("templates/message.html", encoding="utf-8") as messagefile:
-        template_message = Template(messagefile.read())
+    messagefile = pkgutil.get_data(__name__, "templates/message.html")
+    entryfile = pkgutil.get_data(__name__, "templates/entry.html")
 
-    with open("templates/entry.html", encoding="utf-8") as entryfile:
-        template_entry = Template(entryfile.read())
+    assert messagefile and entryfile
+    template_message = Template(messagefile.decode())
+    template_entry = Template(entryfile.decode())
 
     entries_html = "".join(template_entry.substitute(**asdict(e)) for e in entries)
     return template_message.substitute(entries=entries_html)

@@ -4,6 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["Maor Kadosh <git@avocadosh.xyz>"]
 readme = "README.md"
+include = [
+    { path = "templates", format = ["sdist", "wheel"]}
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
