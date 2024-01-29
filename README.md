@@ -8,7 +8,6 @@ You'll need to set the following env vars (or dump them in a `.env` file):
 ```
 MINIFLUX_DIGEST_API_KEY=
 MINIFLUX_DIGEST_API_URL=
-MINIFLUX_DIGEST_CATEGORY_TITLE=
 MINIFLUX_DIGEST_SMTP_PASSWORD=
 MINIFLUX_DIGEST_SMTP_SERVER=
 MINIFLUX_DIGEST_SMTP_USER=
@@ -24,7 +23,7 @@ poetry install
 
 ## Usage
 ``` shell
-miniflux-mail-digest
+miniflux-digest
 ```
 
 It'll work

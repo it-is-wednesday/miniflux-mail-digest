@@ -62,17 +62,14 @@ def entry_essence(entry: dict) -> Entry:
     )
 
 
-def fetch_entries(client: miniflux.Client, category_title: str) -> Iterable[dict]:
-    """Fetch raw entries from category"""
-    try:
-        category_id = next(c for c in client.get_categories() if c["title"] == category_title)["id"]
-    except StopIteration:
-        print(f"Uhhh what happened to the {category_title} category?", file=sys.stderr)
-        sys.exit(1)
-
-    entries = client.get_entries(category_id=category_id, status="unread")["entries"]
+def fetch_entries(client: miniflux.Client) -> Iterable[dict]:
+    """Fetch raw unread entries, mark all as read"""
+    entries = client.get_entries(status="unread")["entries"]
     yield from entries
-    client.mark_category_entries_as_read(category_id)
+
+    # mark all encountered feeds read
+    for feed_id in set(entry['feed']['id'] for entry in entries):
+        client.mark_feed_entries_as_read(feed_id)
 
 
 def make_html(entries: List[Entry]):
@@ -105,7 +102,6 @@ def main():
 
     miniflux_api_key = getenv("API_KEY")
     miniflux_api_url = getenv("API_URL")
-    miniflux_category = getenv("CATEGORY_TITLE")
     smtp_password = getenv("SMTP_PASSWORD")
     smtp_server = getenv("SMTP_SERVER")
     smtp_user = getenv("SMTP_USER")
@@ -114,7 +110,7 @@ def main():
     mail_title = getenv("MAIL_TITLE")
 
     miniflux_client = miniflux.Client(miniflux_api_url, api_key=miniflux_api_key)
-    entries = map(entry_essence, fetch_entries(miniflux_client, miniflux_category))
+    entries = map(entry_essence, fetch_entries(miniflux_client))
 
     smtpclient = smtplib.SMTP_SSL(host=smtp_server, port=465)
     smtpclient.login(user=smtp_user, password=smtp_password)
