@@ -1,3 +1,9 @@
+"""
+Miniflux digest.
+
+Fetch unread Miniflux entries, compile an E-mail digest out of them, mark them
+as read — and send it to its way to waste my time!
+"""
 import os
 import pkgutil
 import smtplib
@@ -17,7 +23,7 @@ PEEK_CHARS_COUNT = 300
 
 
 def getenv(key: str) -> str:
-    """Get env var or throw"""
+    """Get env var or exit(1)."""
     key = "MINIFLUX_DIGEST_" + key
     val = os.getenv(key)
     if not val:
@@ -31,7 +37,12 @@ def getenv(key: str) -> str:
 
 @dataclass
 class Entry:
-    """An entry in the digest mail message"""
+    """
+    An entry in the digest mail message.
+
+    This is an internal representation, not to be confused with EntryResponse —
+    which is what gets yielded by the Miniflux API.
+    """
 
     title: str
     source_feed: str
@@ -41,9 +52,7 @@ class Entry:
 
 
 def entry_essence(entry: dict) -> Entry:
-    """
-    Receive entry from Miniflux's API, extract the bits needed for HTML representation
-    """
+    """Receive entry from Miniflux's API, extract the bits needed for HTML representation."""
     # some feeds serve HTML in the content field rather than plaintext. can you
     # believe it?
     content_text = BeautifulSoup(entry["content"], "html.parser").text.replace("\n", " ")
@@ -57,7 +66,7 @@ def entry_essence(entry: dict) -> Entry:
 
 
 def fetch_entries(client: miniflux.Client) -> Iterable[dict]:
-    """Fetch raw unread entries, mark all as read"""
+    """Fetch raw unread entries, mark all as read."""
     entries = client.get_entries(status="unread")["entries"]
     yield from entries
 
@@ -67,7 +76,7 @@ def fetch_entries(client: miniflux.Client) -> Iterable[dict]:
 
 
 def make_html(entries: List[Entry]) -> str:
-    """Bake a nice HTML-based E-mail featuring _entries_"""
+    """Bake a nice HTML-based E-mail featuring _entries_."""
     messagefile = pkgutil.get_data(__name__, "templates/message.html")
     entryfile = pkgutil.get_data(__name__, "templates/entry.html")
     assert messagefile
@@ -81,7 +90,7 @@ def make_html(entries: List[Entry]) -> str:
 
 
 def make_mail(title: str, content: str, from_addr: str, to_addr: str) -> EmailMessage:
-    """Carefully craft an Email Message"""
+    """Carefully craft an Email Message."""
     msg = EmailMessage()
     msg.set_content(content)
     msg.set_type("text/html")
@@ -92,7 +101,7 @@ def make_mail(title: str, content: str, from_addr: str, to_addr: str) -> EmailMe
 
 
 def main() -> None:
-    """Entry point"""
+    """Entry point."""
     load_dotenv()
 
     miniflux_api_key = getenv("API_KEY")

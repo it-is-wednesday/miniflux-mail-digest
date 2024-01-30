@@ -34,5 +34,6 @@ preview = true
 select = [
     "PIE", "RUF", "F", "E", "W", "I", "UP", "FURB", "ANN", "ASYNC", "B", "A",
     "C4", "T10", "ISC", "INP", "PT", "SIM", "TID", "INT", "PTH", "ERA", "PL",
-    "TRY", "PERF", "LOG",
+    "TRY", "PERF", "LOG", "D",
 ]
+ignore = ["D212"]
