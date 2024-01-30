@@ -1,17 +1,11 @@
-"""
-TODO:
-- Use miniflux's HTML so it looks official or smth :^)
-- Convert testbed to a proper test file that is still REPL-usable
-- Logging
-"""
 import os
 import pkgutil
 import smtplib
 import sys
+from dataclasses import asdict, dataclass
 from email.message import EmailMessage
 from string import Template
 from typing import Iterable, List
-from dataclasses import dataclass, asdict
 
 import miniflux  # type: ignore
 from bs4 import BeautifulSoup
@@ -68,16 +62,17 @@ def fetch_entries(client: miniflux.Client) -> Iterable[dict]:
     yield from entries
 
     # mark all encountered feeds read
-    for feed_id in set(entry['feed']['id'] for entry in entries):
+    for feed_id in {entry["feed"]["id"] for entry in entries}:
         client.mark_feed_entries_as_read(feed_id)
 
 
-def make_html(entries: List[Entry]):
+def make_html(entries: List[Entry]) -> str:
     """Bake a nice HTML-based E-mail featuring _entries_"""
     messagefile = pkgutil.get_data(__name__, "templates/message.html")
     entryfile = pkgutil.get_data(__name__, "templates/entry.html")
+    assert messagefile
+    assert entryfile
 
-    assert messagefile and entryfile
     template_message = Template(messagefile.decode())
     template_entry = Template(entryfile.decode())
 
@@ -96,7 +91,7 @@ def make_mail(title: str, content: str, from_addr: str, to_addr: str) -> EmailMe
     return msg
 
 
-def main():
+def main() -> None:
     """Entry point"""
     load_dotenv()
 
