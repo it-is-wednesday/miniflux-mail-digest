@@ -1,0 +1,6 @@
+#!/bin/bash
+command -v pyenv 2>/dev/null || { echo "Uhhh please install pyenv!!"; exit 1; }
+ROOT="$(realpath "${BASH_SOURCE[0]}/../..")"
+pyenv exec python -m venv "$ROOT/.venv"
+"$ROOT/.venv/bin/pip" install --upgrade pip-tools pip
+"$ROOT/.venv/bin/pip" install -r requirements.txt

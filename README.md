@@ -18,12 +18,13 @@ MINIFLUX_DIGEST_MAIL_TITLE=
 
 ## Installation
 ``` shell
-poetry install
+scripts/make-venv
+.venv/bin/pip install .
 ```
 
 ## Usage
 ``` shell
-miniflux-digest
+.venv/bin/miniflux-digest
 ```
 
 It'll work

@@ -4,12 +4,12 @@ version = "0.1.0"
 description = ""
 authors = [{name = "Maor Kadosh", email = "git@avocadosh.xyz"}]
 readme = "README.md"
+requires-python = ">=3.8"
 
 dependencies = [
-    "python == 3.7",
     "miniflux == 1.*",
     "beautifulsoup4 == 4.12.*",
-    "python-dotenv == 0.21.1", # because of the python version,
+    "python-dotenv == 0.21.1", # because of the python version
 ]
 
 [tool.flit.sdist]
