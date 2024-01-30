@@ -19,7 +19,7 @@ include = ["doc/"]
 dev = ["types-beautifulsoup4 == 4.12.*"]
 
 [project.scripts]
-flit = "miniflux_mail_digest:main"
+miniflux-digest = "miniflux_mail_digest.main:main"
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]

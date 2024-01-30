@@ -79,14 +79,17 @@ def make_html(entries: List[Entry]) -> str:
     """Bake a nice HTML-based E-mail featuring _entries_."""
     messagefile = pkgutil.get_data(__name__, "templates/message.html")
     entryfile = pkgutil.get_data(__name__, "templates/entry.html")
+    cssfile = pkgutil.get_data(__name__, "style.css")
     assert messagefile
     assert entryfile
+    assert cssfile
 
     template_message = Template(messagefile.decode())
     template_entry = Template(entryfile.decode())
+    css = cssfile.decode()
 
     entries_html = "".join(template_entry.substitute(**asdict(e)) for e in entries)
-    return template_message.substitute(entries=entries_html)
+    return template_message.substitute(entries=entries_html, style=css)
 
 
 def make_mail(title: str, content: str, from_addr: str, to_addr: str) -> EmailMessage:
