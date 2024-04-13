@@ -24,7 +24,7 @@ PEEK_CHARS_COUNT = 300
 
 def getenv(key: str) -> str:
     """Get env var or exit(1)."""
-    key = "MINIFLUX_DIGEST_" + key
+    key = f"MINIFLUX_DIGEST_{key}"
     val = os.getenv(key)
     if not val:
         print(
