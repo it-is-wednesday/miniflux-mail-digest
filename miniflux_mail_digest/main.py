@@ -4,10 +4,12 @@ Miniflux digest.
 Fetch unread Miniflux entries, compile an E-mail digest out of them, mark them
 as read — and send it to its way to waste my time!
 """
+
 import os
 import pkgutil
 import smtplib
 import sys
+import urllib.parse
 from dataclasses import asdict, dataclass
 from email.message import EmailMessage
 from string import Template
@@ -22,6 +24,29 @@ __version__ = "0.1"
 PEEK_CHARS_COUNT = 300
 
 
+def main() -> None:
+    """Entry point."""
+    load_dotenv()
+
+    miniflux_api_key = getenv("API_KEY")
+    miniflux_api_url = strip_version_from_url(getenv("API_URL"))
+    smtp_password = getenv("SMTP_PASSWORD")
+    smtp_server = getenv("SMTP_SERVER")
+    smtp_user = getenv("SMTP_USER")
+    from_addr = getenv("FROM_ADDR")
+    to_addr = getenv("TO_ADDR")
+    mail_title = getenv("MAIL_TITLE")
+
+    miniflux_client = miniflux.Client(miniflux_api_url, api_key=miniflux_api_key)
+    entries = map(entry_essence, fetch_entries(miniflux_client))
+
+    smtpclient = smtplib.SMTP_SSL(host=smtp_server, port=465)
+    smtpclient.login(user=smtp_user, password=smtp_password)
+
+    content = make_html(entries)
+    smtpclient.send_message(make_mail(mail_title, content, from_addr, to_addr))
+
+
 def getenv(key: str) -> str:
     """Get env var or exit(1)."""
     key = f"MINIFLUX_DIGEST_{key}"
@@ -33,6 +58,16 @@ def getenv(key: str) -> str:
         )
         sys.exit(1)
     return val
+
+
+def strip_version_from_url(url: str) -> str:
+    """
+    >>> strip_url_path("https://kaki.com/miniflux/v1")
+    https://kaki.com/miniflux
+    """
+    parsed = urllib.parse.urlparse(url)
+    path = parsed.path.replace("/v1", "")
+    return f"{parsed.scheme}://{parsed.netloc}{path}"
 
 
 @dataclass
@@ -75,7 +110,7 @@ def fetch_entries(client: miniflux.Client) -> Iterable[dict]:
         client.mark_feed_entries_as_read(feed_id)
 
 
-def make_html(entries: List[Entry]) -> str:
+def make_html(entries: Iterable[Entry]) -> str:
     """Bake a nice HTML-based E-mail featuring _entries_."""
     messagefile = pkgutil.get_data(__name__, "templates/message.html")
     entryfile = pkgutil.get_data(__name__, "templates/entry.html")
@@ -101,29 +136,6 @@ def make_mail(title: str, content: str, from_addr: str, to_addr: str) -> EmailMe
     msg.add_header("To", to_addr)
     msg.add_header("Subject", title)
     return msg
-
-
-def main() -> None:
-    """Entry point."""
-    load_dotenv()
-
-    miniflux_api_key = getenv("API_KEY")
-    miniflux_api_url = getenv("API_URL")
-    smtp_password = getenv("SMTP_PASSWORD")
-    smtp_server = getenv("SMTP_SERVER")
-    smtp_user = getenv("SMTP_USER")
-    from_addr = getenv("FROM_ADDR")
-    to_addr = getenv("TO_ADDR")
-    mail_title = getenv("MAIL_TITLE")
-
-    miniflux_client = miniflux.Client(miniflux_api_url, api_key=miniflux_api_key)
-    entries = map(entry_essence, fetch_entries(miniflux_client))
-
-    smtpclient = smtplib.SMTP_SSL(host=smtp_server, port=465)
-    smtpclient.login(user=smtp_user, password=smtp_password)
-
-    content = make_html(entries)
-    smtpclient.send_message(make_mail(mail_title, content, from_addr, to_addr))
 
 
 if __name__ == "__main__":

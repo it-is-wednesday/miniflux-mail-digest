@@ -12,11 +12,11 @@ dependencies = [
     "python-dotenv == 0.21.1", # because of the python version
 ]
 
+[dependency-groups]
+dev = ["types-beautifulsoup4 == 4.12.*"]
+
 [tool.flit.sdist]
 include = ["doc/"]
-
-[project.optional-dependencies]
-dev = ["types-beautifulsoup4 == 4.12.*"]
 
 [project.scripts]
 miniflux-digest = "miniflux_mail_digest.main:main"

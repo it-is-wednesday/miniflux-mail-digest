@@ -16,15 +16,10 @@ MINIFLUX_DIGEST_TO_ADDR=
 MINIFLUX_DIGEST_MAIL_TITLE=
 ```
 
-## Installation
-``` shell
-scripts/make-venv
-.venv/bin/pip install .
-```
-
 ## Usage
 ``` shell
-.venv/bin/miniflux-digest
+uv sync
+uv run miniflux-digest
 ```
 
 It'll work

@@ -1,3 +1,0 @@
-#!/bin/bash
-ROOT="$(realpath "$(dirname "${BASH_SOURCE[0]}")/../")"
-"$ROOT/.venv/bin/pip-compile" --config "$ROOT/pyproject.toml" -o requirements.txt --strip-extras
